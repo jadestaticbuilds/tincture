@@ -232,14 +232,17 @@ function doPour(a,b){
   const t=A[A.length-1];
   if(t===P){B.push(A.pop());}
   else{while(A.length&&A[A.length-1]===t&&B.length<CAP)B.push(A.pop());}
-  adoptAll();S.moves++;S.sel=-1;
+  adoptTouched(B);S.moves++;S.sel=-1;
   sfx.pour();save();render(true,b);
   if(checkWin())setTimeout(onWin,350);
 }
-function adoptAll(){
+/* A prismatic adopts the color it touches — but ONLY in the flask the player
+   just poured into. Below first, then above; cascades. Prismatics elsewhere
+   on the board wait untouched until the player decides their fate. */
+function adoptTouched(f){
   let changed=true;
   while(changed){changed=false;
-    for(const f of S.flasks)for(let i=0;i<f.length;i++){
+    for(let i=0;i<f.length;i++){
       if(f[i]!==P)continue;
       const below=i>0?f[i-1]:null, above=i<f.length-1?f[i+1]:null;
       if(below!==null&&below!==P){f[i]=below;changed=true;}
