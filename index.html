@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1410">
+<title>Tincture — an alchemist's sorting ritual</title>
+<meta name="description" content="Tincture: sort volatile elixirs into their flasks. A relaxed alchemy puzzler from Jade Static Builds.">
+<style>
+:root{
+  --bg0:#0b1410; --bg1:#060b08;
+  --jade:#8fe0b3; --jade-hi:#d7f5e3; --jade-dim:#3f6b52;
+  --gold:#e8c76a; --ink:#eef7f2; --mute:#8fa89b;
+  --panel:rgba(16,32,24,.92); --line:rgba(143,224,179,.22);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  min-height:100vh;min-height:100dvh;background:radial-gradient(120% 90% at 50% 0%,#12261b 0%,var(--bg0) 55%,var(--bg1) 100%);
+  color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  display:flex;flex-direction:column;align-items:center;touch-action:manipulation;user-select:none;-webkit-user-select:none;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(14px + env(safe-area-inset-bottom));
+}
+.wrap{width:100%;max-width:460px;display:flex;flex-direction:column;min-height:100%;gap:10px}
+header{display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:var(--mono);letter-spacing:.28em;font-size:13px;color:var(--jade)}
+.lvl{font-family:var(--mono);font-size:13px;color:var(--mute)}
+.hbtns{display:flex;gap:8px}
+.hbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--jade);
+  font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.hbtn:active{transform:scale(.94)}
+#toast{min-height:22px;text-align:center;font-size:13px;color:var(--gold);font-family:var(--mono);letter-spacing:.04em}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 8px;justify-items:center;padding:6px 2px}
+.flask{width:68px;cursor:pointer;position:relative}
+.flask .neck{height:10px;margin:0 14px;border:2px solid rgba(220,235,228,.4);border-bottom:none;border-radius:6px 6px 0 0;
+  background:linear-gradient(180deg,rgba(200,220,210,.14),transparent)}
+.flask .body{position:relative;height:132px;border:2px solid rgba(220,235,228,.32);border-top:none;border-radius:0 0 30px 30px;
+  background:linear-gradient(180deg,rgba(20,34,26,.25),rgba(8,14,11,.55));overflow:hidden}
+.flask .fill{position:absolute;left:5px;right:5px;bottom:5px;top:8px;display:flex;flex-direction:column-reverse;gap:3px}
+.elixir{flex:1;border-radius:5px 5px 12px 12px;position:relative;transition:transform .12s ease,box-shadow .12s ease;
+  box-shadow:inset 0 3px 4px rgba(255,255,255,.35),inset 0 -3px 5px rgba(0,0,0,.35)}
+.elixir::after{content:"";position:absolute;left:7px;top:5px;width:7px;height:10px;border-radius:50%;
+  background:rgba(255,255,255,.5);filter:blur(1px)}
+.flask.sel .elixir.top{transform:translateY(-11px);box-shadow:0 0 14px var(--glow,rgba(255,255,255,.7)),inset 0 3px 4px rgba(255,255,255,.4)}
+.elixir.prism{background:conic-gradient(from 0deg,#ff6b9d,#ffd60a,#2ee6a8,#41e6ff,#9b5cf6,#ff6b9d);
+  animation:shimmer 2.4s linear infinite}
+.elixir.prism::before{content:"✦";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.9);font-size:15px;text-shadow:0 0 6px #fff}
+@keyframes shimmer{to{filter:hue-rotate(360deg)}}
+.flask.bump .body{animation:bump .25s ease}
+@keyframes bump{35%{transform:scale(1.045)}}
+.toolbelt{display:flex;gap:10px;justify-content:center;margin-top:2px}
+.tool{flex:1;max-width:150px;border:1px solid var(--line);background:var(--panel);border-radius:14px;color:var(--ink);
+  padding:10px 6px;font:inherit;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:64px}
+.tool .t-ico{font-size:20px}
+.tool .t-n{font-family:var(--mono);font-size:11px;color:var(--jade)}
+.tool:disabled{opacity:.35;cursor:default}
+.tool:not(:disabled):active{transform:scale(.95)}
+.moves{text-align:center;font-family:var(--mono);font-size:12px;color:var(--mute)}
+#win{position:fixed;inset:0;background:rgba(4,8,6,.82);display:none;align-items:center;justify-content:center;z-index:20;padding:24px}
+#win.show{display:flex}
+.wincard{background:linear-gradient(170deg,#142b1e,#080f0b);border:1px solid var(--jade-dim);border-radius:20px;
+  padding:34px 30px;text-align:center;max-width:340px;box-shadow:0 0 60px rgba(143,224,179,.18)}
+.wincard h2{margin:0 0 6px;font-size:24px;letter-spacing:.06em;color:var(--jade-hi)}
+.wincard p{color:var(--mute);font-size:14px;margin:0 0 20px}
+.bigbtn{background:linear-gradient(180deg,#a9ecbe,#7fd6a0);border:none;border-radius:14px;color:#0b2417;
+  font:inherit;font-weight:700;font-size:17px;padding:14px 34px;cursor:pointer;min-height:52px}
+.bigbtn:active{transform:scale(.96)}
+footer{margin-top:auto;padding-top:14px;text-align:center;font-size:11px;color:var(--mute);font-family:var(--mono);letter-spacing:.08em}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:11.5px;color:var(--mute)}
+.legend b{color:var(--jade);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">TINCTURE</div>
+      <div class="lvl" id="lvlLabel">Level 1</div>
+    </div>
+    <div class="hbtns">
+      <button class="hbtn" id="muteBtn" aria-label="Toggle sound">🔔</button>
+      <button class="hbtn" id="restartBtn" aria-label="Restart level">↺</button>
+    </div>
+  </header>
+  <div id="toast"></div>
+  <div class="board" id="board"></div>
+  <div class="moves" id="movesLabel">0 moves</div>
+  <div class="toolbelt">
+    <button class="tool" id="undoBtn"><span class="t-ico">↩</span><span>Undo</span><span class="t-n">∞</span></button>
+    <button class="tool" id="flaskBtn"><span class="t-ico">⚗</span><span>Spare flask</span><span class="t-n" id="flaskN">–</span></button>
+    <button class="tool" id="brewBtn"><span class="t-ico">🌀</span><span>Rebrew</span><span class="t-n" id="brewN">–</span></button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <footer>A JADE STATIC BUILDS PROJECT · BUILT WITH MUSE</footer>
+</div>
+<div id="win"><div class="wincard">
+  <h2>TRANSMUTATION<br>COMPLETE</h2>
+  <p id="winStats"></p>
+  <button class="bigbtn" id="nextBtn">Next level →</button>
+</div></div>
+<script>
+"use strict";
+/* ---------- utils ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const $=id=>document.getElementById(id);
+const CAP=4, SAVE_KEY="tincture.v1";
+
+/* elixir palette: [name, light, dark] */
+const COLORS=[
+  ["Ruby","#ff7a7a","#c81e3a"],
+  ["Amber","#ffc46b","#d97a08"],
+  ["Gold","#ffe873","#d9a400"],
+  ["Jade","#7bf0b6","#0d9d5f"],
+  ["Frost","#7de9ff","#0e7fd9"],
+  ["Arcane","#c39bff","#6d28d9"],
+  ["Rose","#ff9dc4","#d92662"],
+  ["Ember","#ff9a5c","#c2410c"],
+  ["Moss","#a8e08a","#3f7d2c"],
+];
+const P="P"; // prismatic
+
+/* ---------- audio ---------- */
+let AC=null;
+function beep(f0,f1,dur,type,vol){
+  if(S.muted)return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||"sine";o.frequency.setValueAtTime(f0,AC.currentTime);
+    o.frequency.exponentialRampToValueAtTime(f1,AC.currentTime+dur);
+    g.gain.setValueAtTime(vol||.12,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);
+    o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+dur);
+  }catch(e){}
+}
+const sfx={
+  select(){beep(620,660,.06,"sine",.08);},
+  pour(){beep(280,520,.14,"sine",.1);},
+  bad(){beep(160,120,.12,"square",.05);},
+  tool(){beep(440,880,.12,"triangle",.09);},
+  win(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,f,.18,"sine",.1),i*110));}
+};
+
+/* ---------- state ---------- */
+let S=null;
+function levelParams(n){
+  return {
+    colors:Math.min(4+Math.floor((n-1)/2),9),
+    prism:n>=8?2:(n>=4?1:0),
+    spare:n>=5?1:0,
+    rebrew:n>=7?1:0,
+  };
+}
+function newState(level,seed){
+  const p=levelParams(level);
+  return {level,seed,flasks:genDeal(p,seed),moves:0,spareLeft:p.spare,rebrewLeft:p.rebrew,
+    undo:[],muted:S?S.muted:false,sel:-1,maxLevel:Math.max(level,S?S.maxLevel:1)};
+}
+function genDeal(p,seed){
+  const rnd=mulberry32(seed);
+  const nF=p.colors+2;
+  for(let attempt=0;attempt<40;attempt++){
+    let F=[];
+    for(let i=0;i<p.colors;i++)F.push([i,i,i,i]);
+    for(let i=p.colors;i<nF;i++)F.push([]);
+    const K=50+p.colors*12;
+    for(let k=0;k<K;k++){
+      const a=Math.floor(rnd()*nF);
+      if(!F[a].length)continue;
+      const b=Math.floor(rnd()*nF);
+      if(a===b||F[b].length>=CAP)continue;
+      F[b].push(F[a].pop());
+    }
+    placePrism(F,p,rnd,nF);
+    if(!checkWinF(F)&&misplaced(F)>=p.colors)return F;
+  }
+  // fallback: force-disturb (solvable by construction)
+  let F=[];
+  for(let i=0;i<p.colors;i++)F.push([i,i,i,i]);
+  for(let i=p.colors;i<nF;i++)F.push([]);
+  for(let k=0;k<p.colors*4;k++){
+    const a=k%p.colors, b=p.colors+(k%2);
+    if(F[a].length&&F[b].length<CAP)F[b].push(F[a].pop());
+  }
+  placePrism(F,p,rnd,nF);
+  return F;
+}
+function placePrism(F,p,rnd,nF){
+  let placed=0,guard=0;
+  while(placed<p.prism&&guard++<600){
+    const f=Math.floor(rnd()*nF);
+    if(!F[f].length)continue;
+    const idx=Math.floor(rnd()*F[f].length);
+    if(F[f][idx]!==P){F[f][idx]=P;placed++;}
+  }
+}
+function misplaced(F){
+  // count elixirs not matching the flask's majority color
+  let m=0;
+  for(const f of F){
+    if(!f.length)continue;
+    const cnt={};
+    for(const e of f)if(e!==P)cnt[e]=(cnt[e]||0)+1;
+    const top=Math.max(0,...Object.values(cnt));
+    m+=f.filter(e=>e!==P).length-top;
+  }
+  return m;
+}
+function checkWinF(F){
+  return F.every(f=>!f.length||(f.length===CAP&&f[0]!==P&&f.every(e=>e===f[0])));
+}
+const checkWin=()=>checkWinF(S.flasks);
+
+/* ---------- rules ---------- */
+function snap(){return JSON.stringify({f:S.flasks,s:S.spareLeft,r:S.rebrewLeft,m:S.moves});}
+function pushUndo(){S.undo.push(snap());if(S.undo.length>300)S.undo.shift();}
+function restore(s){const o=JSON.parse(s);S.flasks=o.f;S.spareLeft=o.s;S.rebrewLeft=o.r;S.moves=o.m;S.sel=-1;}
+function canPour(a,b){
+  if(a===b||a<0||b<0)return false;
+  const A=S.flasks[a],B=S.flasks[b];
+  if(!A.length||B.length>=CAP)return false;
+  const ta=A[A.length-1];
+  if(!B.length)return true;
+  const tb=B[B.length-1];
+  return ta===P||tb===P||ta===tb;
+}
+function doPour(a,b){
+  pushUndo();
+  const A=S.flasks[a],B=S.flasks[b];
+  const t=A[A.length-1];
+  if(t===P){B.push(A.pop());}
+  else{while(A.length&&A[A.length-1]===t&&B.length<CAP)B.push(A.pop());}
+  adoptAll();S.moves++;S.sel=-1;
+  sfx.pour();save();render(true,b);
+  if(checkWin())setTimeout(onWin,350);
+}
+function adoptAll(){
+  let changed=true;
+  while(changed){changed=false;
+    for(const f of S.flasks)for(let i=0;i<f.length;i++){
+      if(f[i]!==P)continue;
+      const below=i>0?f[i-1]:null, above=i<f.length-1?f[i+1]:null;
+      if(below!==null&&below!==P){f[i]=below;changed=true;}
+      else if(above!==null&&above!==P){f[i]=above;changed=true;}
+    }
+  }
+}
+function tapFlask(i){
+  const f=S.flasks[i];
+  if(S.sel===-1){
+    if(!f.length){sfx.bad();return;}
+    S.sel=i;sfx.select();render();
+  }else if(S.sel===i){S.sel=-1;render();}
+  else{
+    if(canPour(S.sel,i)){doPour(S.sel,i);}
+    else if(f.length){S.sel=i;sfx.select();render();}
+    else{S.sel=-1;sfx.bad();render();}
+  }
+}
+
+/* ---------- tools ---------- */
+function doUndo(){
+  if(!S.undo.length){sfx.bad();return;}
+  restore(S.undo.pop());sfx.tool();save();render();
+}
+function doSpare(){
+  if(S.spareLeft<=0){sfx.bad();return;}
+  pushUndo();S.flasks.push([]);S.spareLeft--;S.moves++;
+  toast("Spare flask added");sfx.tool();save();render();
+}
+function doRebrew(){
+  if(S.rebrewLeft<=0){sfx.bad();return;}
+  pushUndo();
+  const p=levelParams(S.level);
+  S.flasks=genDeal(p,(Math.random()*1e9)|0);
+  S.spareLeft=p.spare;S.rebrewLeft=0;S.moves=0;S.sel=-1;
+  toast("Rebrewed — a fresh soluble batch");sfx.tool();save();render();
+}
+
+/* ---------- render ---------- */
+function elixirHTML(e,isTop){
+  if(e===P)return `<div class="elixir prism${isTop?" top":""}"></div>`;
+  const c=COLORS[e];
+  return `<div class="elixir${isTop?" top":""}" style="--glow:${c[1]}66;background:linear-gradient(180deg,${c[1]},${c[2]})"></div>`;
+}
+function render(bump){
+  $("lvlLabel").textContent="Level "+S.level;
+  $("movesLabel").textContent=S.moves+(S.moves===1?" move":" moves");
+  const bd=$("board");bd.innerHTML="";
+  S.flasks.forEach((f,i)=>{
+    const d=document.createElement("div");
+    d.className="flask"+(S.sel===i?" sel":"")+(bump===i?" bump":"");
+    let fill="";
+    for(let k=0;k<f.length;k++)fill+=elixirHTML(f[k],k===f.length-1);
+    d.innerHTML=`<div class="neck"></div><div class="body"><div class="fill">${fill}</div></div>`;
+    d.addEventListener("click",()=>tapFlask(i));
+    bd.appendChild(d);
+  });
+  $("undoBtn").disabled=!S.undo.length;
+  const p=levelParams(S.level);
+  $("flaskBtn").disabled=S.spareLeft<=0;
+  $("brewBtn").disabled=S.rebrewLeft<=0;
+  $("flaskN").textContent=p.spare?("×"+S.spareLeft):"–";
+  $("brewN").textContent=p.rebrew?("×"+S.rebrewLeft):"–";
+  const lg=[];
+  if(S.level>=4)lg.push("<span><b>✦ Prismatic</b> takes the color it touches</span>");
+  if(p.spare)lg.push("<span><b>⚗ Spare flask</b> when you're stuck</span>");
+  if(p.rebrew)lg.push("<span><b>🌀 Rebrew</b> reshuffles the batch</span>");
+  $("legend").innerHTML=lg.join("");
+  $("muteBtn").textContent=S.muted?"🔕":"🔔";
+}
+let toastT=null;
+function toast(msg){
+  const t=$("toast");t.textContent=msg;
+  clearTimeout(toastT);toastT=setTimeout(()=>t.textContent="",2600);
+}
+function unlockNotices(level){
+  const p=levelParams(level),pp=levelParams(level-1);
+  if(p.prism>pp.prism)toast("New: ✦ Prismatic elixir — takes the color it touches");
+  else if(p.spare>pp.spare)toast("New tool: ⚗ Spare flask");
+  else if(p.rebrew>pp.rebrew)toast("New tool: 🌀 Rebrew");
+}
+function onWin(){
+  sfx.win();
+  $("winStats").textContent=`Level ${S.level} sorted in ${S.moves} moves.`;
+  $("win").classList.add("show");
+  S.maxLevel=Math.max(S.maxLevel,S.level+1);save();
+}
+
+/* ---------- persistence ---------- */
+function save(){
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({
+    level:S.level,seed:S.seed,flasks:S.flasks,moves:S.moves,
+    spareLeft:S.spareLeft,rebrewLeft:S.rebrewLeft,muted:S.muted,
+    maxLevel:S.maxLevel,undo:S.undo.slice(-60)}));}catch(e){}
+}
+function load(){
+  try{
+    const o=JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(o&&o.flasks&&o.flasks.length){
+      S={level:o.level,seed:o.seed,flasks:o.flasks,moves:o.moves||0,
+        spareLeft:o.spareLeft,rebrewLeft:o.rebrewLeft,undo:o.undo||[],
+        muted:!!o.muted,sel:-1,maxLevel:o.maxLevel||o.level};
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+/* ---------- init ---------- */
+function startLevel(level,seed){
+  S=newState(level,seed===undefined?(Math.random()*1e9)|0:seed);
+  $("win").classList.remove("show");
+  unlockNotices(level);save();render();
+}
+$("undoBtn").addEventListener("click",doUndo);
+$("flaskBtn").addEventListener("click",doSpare);
+$("brewBtn").addEventListener("click",doRebrew);
+$("restartBtn").addEventListener("click",()=>{pushUndo();startLevel(S.level,S.seed);toast("Level restarted");});
+$("muteBtn").addEventListener("click",()=>{S.muted=!S.muted;save();render();if(!S.muted)sfx.select();});
+$("nextBtn").addEventListener("click",()=>startLevel(S.level+1));
+if(!load())startLevel(1);
+else{render();if(checkWin())$("win").classList.add("show");}
+</script>
+</body>
+</html>
