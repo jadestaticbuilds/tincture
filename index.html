@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1410">
 <title>Tincture — an alchemist's sorting ritual</title>
-<meta name="description" content="Tincture: sort volatile elixirs into their flasks. A relaxed alchemy puzzler from Jade Static Builds.">
+<meta name="description" content="Tincture: sort volatile elixirs on a turning mandala. A relaxed alchemy puzzler from Jade Static Builds.">
 <style>
 :root{
   --bg0:#0b1410; --bg1:#060b08;
@@ -22,7 +22,7 @@ body{
   display:flex;flex-direction:column;align-items:center;touch-action:manipulation;user-select:none;-webkit-user-select:none;
   padding:calc(10px + env(safe-area-inset-top)) 12px calc(14px + env(safe-area-inset-bottom));
 }
-.wrap{width:100%;max-width:460px;display:flex;flex-direction:column;min-height:100%;gap:10px}
+.wrap{width:100%;max-width:460px;display:flex;flex-direction:column;min-height:100%;gap:8px}
 header{display:flex;align-items:center;justify-content:space-between}
 .brand{font-family:var(--mono);letter-spacing:.28em;font-size:13px;color:var(--jade)}
 .lvl{font-family:var(--mono);font-size:13px;color:var(--mute)}
@@ -31,22 +31,29 @@ header{display:flex;align-items:center;justify-content:space-between}
   font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .hbtn:active{transform:scale(.94)}
 #toast{min-height:22px;text-align:center;font-size:13px;color:var(--gold);font-family:var(--mono);letter-spacing:.04em}
-.board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 8px;justify-items:center;padding:6px 2px}
-.flask{width:68px;cursor:pointer;position:relative}
-.flask .neck{height:10px;margin:0 14px;border:2px solid rgba(220,235,228,.4);border-bottom:none;border-radius:6px 6px 0 0;
+.board{position:relative;margin:2px 0;touch-action:manipulation}
+.msvg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.msvg .spin{transform-box:fill-box;transform-origin:center;animation:spin 240s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.flask{position:absolute;transform:translate(-50%,-50%);cursor:pointer;transition:left .55s ease,top .55s ease}
+.flask .neck{height:8px;margin:0 11px;border:2px solid rgba(220,235,228,.4);border-bottom:none;border-radius:6px 6px 0 0;
   background:linear-gradient(180deg,rgba(200,220,210,.14),transparent)}
-.flask .body{position:relative;height:132px;border:2px solid rgba(220,235,228,.32);border-top:none;border-radius:0 0 30px 30px;
+.flask .body{position:relative;height:104px;border:2px solid rgba(220,235,228,.32);border-top:none;border-radius:0 0 24px 24px;
   background:linear-gradient(180deg,rgba(20,34,26,.25),rgba(8,14,11,.55));overflow:hidden}
-.flask .fill{position:absolute;left:5px;right:5px;bottom:5px;top:8px;display:flex;flex-direction:column-reverse;gap:3px}
-.elixir{flex:1;border-radius:5px 5px 12px 12px;position:relative;transition:transform .12s ease,box-shadow .12s ease;
+.flask .fill{position:absolute;left:4px;right:4px;bottom:4px;top:6px;display:flex;flex-direction:column-reverse;gap:2px}
+.flask.crucible .neck{border-color:rgba(232,199,106,.55)}
+.flask.crucible .body{height:118px;border-color:rgba(232,199,106,.5);border-radius:0 0 28px 28px;
+  box-shadow:0 0 18px rgba(232,199,106,.12)}
+.clabel{text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-top:3px}
+.elixir{flex:1;border-radius:4px 4px 10px 10px;position:relative;transition:transform .12s ease,box-shadow .12s ease;
   box-shadow:inset 0 3px 4px rgba(255,255,255,.35),inset 0 -3px 5px rgba(0,0,0,.35)}
-.elixir::after{content:"";position:absolute;left:7px;top:5px;width:7px;height:10px;border-radius:50%;
+.elixir::after{content:"";position:absolute;left:6px;top:4px;width:6px;height:8px;border-radius:50%;
   background:rgba(255,255,255,.5);filter:blur(1px)}
-.flask.sel .elixir.top{transform:translateY(-11px);box-shadow:0 0 14px var(--glow,rgba(255,255,255,.7)),inset 0 3px 4px rgba(255,255,255,.4)}
+.flask.sel .elixir.top{transform:translateY(-9px);box-shadow:0 0 14px var(--glow,rgba(255,255,255,.7)),inset 0 3px 4px rgba(255,255,255,.4)}
 .elixir.prism{background:conic-gradient(from 0deg,#ff6b9d,#ffd60a,#2ee6a8,#41e6ff,#9b5cf6,#ff6b9d);
   animation:shimmer 2.4s linear infinite}
 .elixir.prism::before{content:"✦";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,.9);font-size:15px;text-shadow:0 0 6px #fff}
+  color:rgba(255,255,255,.9);font-size:13px;text-shadow:0 0 6px #fff}
 @keyframes shimmer{to{filter:hue-rotate(360deg)}}
 .flask.bump .body{animation:bump .25s ease}
 @keyframes bump{35%{transform:scale(1.045)}}
@@ -68,7 +75,7 @@ header{display:flex;align-items:center;justify-content:space-between}
   font:inherit;font-weight:700;font-size:17px;padding:14px 34px;cursor:pointer;min-height:52px}
 .bigbtn:active{transform:scale(.96)}
 footer{margin-top:auto;padding-top:14px;text-align:center;font-size:11px;color:var(--mute);font-family:var(--mono);letter-spacing:.08em}
-.legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:11.5px;color:var(--mute)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:11.5px;color:var(--mute);text-align:center}
 .legend b{color:var(--jade);font-weight:600}
 </style>
 </head>
@@ -105,7 +112,7 @@ footer{margin-top:auto;padding-top:14px;text-align:center;font-size:11px;color:v
 /* ---------- utils ---------- */
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 const $=id=>document.getElementById(id);
-const CAP=4, SAVE_KEY="tincture.v1";
+const CAP=4, CRUC_CAP=6, SAVE_KEY="tincture.v2", V1_KEY="tincture.v1";
 
 /* elixir palette: [name, light, dark] */
 const COLORS=[
@@ -140,6 +147,7 @@ const sfx={
   pour(){beep(280,520,.14,"sine",.1);},
   bad(){beep(160,120,.12,"square",.05);},
   tool(){beep(440,880,.12,"triangle",.09);},
+  turn(){beep(330,660,.2,"triangle",.07);},
   win(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,f,.18,"sine",.1),i*110));}
 };
 
@@ -151,41 +159,119 @@ function levelParams(n){
     prism:n>=8?2:(n>=4?1:0),
     spare:n>=5?1:0,
     rebrew:n>=7?1:0,
+    wheel:Math.max(8,22-2*n), // moves between rotations; tightens with level
   };
 }
 function newState(level,seed){
   const p=levelParams(level);
-  return {level,seed,flasks:genDeal(p,seed),moves:0,spareLeft:p.spare,rebrewLeft:p.rebrew,
+  const deal=genDeal(p,seed);
+  return {level,seed,flasks:deal.flasks,layout:deal.layout,moves:0,spareLeft:p.spare,rebrewLeft:p.rebrew,
     undo:[],muted:S?S.muted:false,sel:-1,maxLevel:Math.max(level,S?S.maxLevel:1)};
 }
+/* Mandala deal: flasks in one ring around the crucible (last index, starts empty).
+   Generation pours respect ring adjacency, so deals fit the movement rules. */
+/* Every deal is solver-verified before it ships: a depth-first gatekeeper with
+   the exact game rules (adjacency, crucible, prismatic adoption) must find a
+   solution within its node budget, or the seed is discarded and retried.
+   If it finds a solution, the deal IS solvable — high precision gatekeeping. */
+function solvableCheck(F0,layout){
+  const n=layout.ring,C=n;
+  const seen=new Set(); let nodes=0;
+  function dfs(F,d){
+    let win=true;
+    for(let i=0;i<=n;i++){
+      const f=F[i];
+      if(i===C){if(f.length){win=false;break;}}
+      else if(f.length&&!(f.length===CAP&&f[0]!==P&&f.every(e=>e===f[0]))){win=false;break;}
+    }
+    if(win)return true;
+    if(d>=70)return false;
+    const hh=F.map(f=>f.join(',')).join(';');
+    if(seen.has(hh))return false;
+    seen.add(hh);
+    const ms=[];
+    for(let a=0;a<=n;a++){
+      const A=F[a]; if(!A.length)continue;
+      if(a!==C&&A.length===CAP&&A[0]!==P&&A.every(e=>e===A[0]))continue;
+      const ta=A[A.length-1];
+      let run=1; for(let k=A.length-2;k>=0&&A[k]===ta;k--)run++;
+      const nbs=a===C?Array.from({length:n},(_,i)=>i):[(a+1)%n,(a-1+n)%n,C];
+      for(const b of nbs){
+        const B=F[b],capB=b===C?CRUC_CAP:CAP;
+        if(B.length>=capB)continue;
+        if(B.length&&b!==C){const tb=B[B.length-1]; if(!(ta===P||tb===P||ta===tb))continue;}
+        const mv=Math.min(run,capB-B.length),nb=B.length;
+        let sc=Math.random()*0.01;
+        if(b!==C&&nb>0&&B[nb-1]===ta){sc=10+mv*2+nb; if(nb+mv===CAP)sc+=50;}
+        else if(b!==C&&nb===0)sc=5;
+        else if(b===C&&a!==C)sc=3;
+        else if(a===C)sc=4;
+        if(ta===P&&b!==C&&nb>0&&B[nb-1]!==P)sc+=8;
+        ms.push([sc,a,b]);
+      }
+    }
+    ms.sort((x,y)=>y[0]-x[0]);
+    for(const m of ms){
+      if(++nodes>25000)return false;
+      const a=m[1],b=m[2];
+      const G=F.map(f=>f.slice());
+      const A=G[a],B=G[b],t=A[A.length-1],capB=b===C?CRUC_CAP:CAP;
+      if(t===P)B.push(A.pop());
+      else while(A.length&&A[A.length-1]===t&&B.length<capB)B.push(A.pop());
+      adoptTouched(B);
+      if(dfs(G,d+1))return true;
+    }
+    return false;
+  }
+  return dfs(F0.map(f=>f.slice()),0);
+}
 function genDeal(p,seed){
-  const rnd=mulberry32(seed);
   const nF=p.colors+2;
   for(let attempt=0;attempt<40;attempt++){
+    const rnd=mulberry32((seed+attempt*7919)>>>0);
     let F=[];
     for(let i=0;i<p.colors;i++)F.push([i,i,i,i]);
     for(let i=p.colors;i<nF;i++)F.push([]);
-    const K=50+p.colors*12;
+    F.push([]); // crucible
+    const K=30+p.colors*8;
     for(let k=0;k<K;k++){
       const a=Math.floor(rnd()*nF);
       if(!F[a].length)continue;
-      const b=Math.floor(rnd()*nF);
-      if(a===b||F[b].length>=CAP)continue;
+      const nb=[(a+1)%nF,(a-1+nF)%nF];
+      const b=nb[Math.floor(rnd()*nb.length)];
+      if(F[b].length>=CAP)continue;
       F[b].push(F[a].pop());
     }
     placePrism(F,p,rnd,nF);
-    if(!checkWinF(F)&&misplaced(F)>=p.colors)return F;
+    const layout={ring:nF};
+    if(checkWinF(F,layout))continue;
+    if(misplaced(F)>=p.colors&&solvableCheck(F,layout))return{flasks:F,layout};
   }
-  // fallback: force-disturb (solvable by construction)
+  // fallback: a light, easily-solved scramble (still solver-checked once)
+  const rnd=mulberry32((seed^0x9e3779b9)>>>0);
   let F=[];
   for(let i=0;i<p.colors;i++)F.push([i,i,i,i]);
   for(let i=p.colors;i<nF;i++)F.push([]);
-  for(let k=0;k<p.colors*4;k++){
-    const a=k%p.colors, b=p.colors+(k%2);
-    if(F[a].length&&F[b].length<CAP)F[b].push(F[a].pop());
+  F.push([]);
+  for(let k=0;k<14;k++){
+    const a=Math.floor(rnd()*nF);
+    if(!F[a].length)continue;
+    const nb=[(a+1)%nF,(a-1+nF)%nF];
+    const b=nb[Math.floor(rnd()*nb.length)];
+    if(F[b].length>=CAP)continue;
+    F[b].push(F[a].pop());
   }
   placePrism(F,p,rnd,nF);
-  return F;
+  const layout={ring:nF};
+  if(!solvableCheck(F,layout)){ // last resort: near-solved deal
+    F=[];
+    for(let i=0;i<p.colors;i++)F.push([i,i,i,i]);
+    for(let i=p.colors;i<nF;i++)F.push([]);
+    F.push([]);
+    const a=0,b=1;
+    F[b].push(F[a].pop());F[b].push(F[a].pop());
+  }
+  return{flasks:F,layout};
 }
 function placePrism(F,p,rnd,nF){
   let placed=0,guard=0;
@@ -197,7 +283,6 @@ function placePrism(F,p,rnd,nF){
   }
 }
 function misplaced(F){
-  // count elixirs not matching the flask's majority color
   let m=0;
   for(const f of F){
     if(!f.length)continue;
@@ -208,37 +293,59 @@ function misplaced(F){
   }
   return m;
 }
-function checkWinF(F){
-  return F.every(f=>!f.length||(f.length===CAP&&f[0]!==P&&f.every(e=>e===f[0])));
+function checkWinF(F,layout){
+  const C=layout.ring; // crucible index
+  return F.every((f,i)=>{
+    if(i===C)return f.length===0; // the crucible must be empty to complete the ritual
+    return !f.length||(f.length===CAP&&f[0]!==P&&f.every(e=>e===f[0]));
+  });
 }
-const checkWin=()=>checkWinF(S.flasks);
+const checkWin=()=>checkWinF(S.flasks,S.layout);
+
+/* ---------- mandala movement ---------- */
+// ring flask i: neighbors are i-1, i+1 on the ring, plus the crucible.
+// the crucible is adjacent to every flask — all paths cross at the heart.
+function neighbors(a){
+  const n=S.layout.ring, C=n;
+  if(a===C){const r=[];for(let i=0;i<n;i++)r.push(i);return r;}
+  return[(a+1)%n,(a-1+n)%n,C];
+}
 
 /* ---------- rules ---------- */
-function snap(){return JSON.stringify({f:S.flasks,s:S.spareLeft,r:S.rebrewLeft,m:S.moves});}
+function snap(){return JSON.stringify({f:S.flasks,l:S.layout,s:S.spareLeft,r:S.rebrewLeft,m:S.moves});}
 function pushUndo(){S.undo.push(snap());if(S.undo.length>300)S.undo.shift();}
-function restore(s){const o=JSON.parse(s);S.flasks=o.f;S.spareLeft=o.s;S.rebrewLeft=o.r;S.moves=o.m;S.sel=-1;}
+function restore(s){const o=JSON.parse(s);S.flasks=o.f;S.layout=o.l;S.spareLeft=o.s;S.rebrewLeft=o.r;S.moves=o.m;S.sel=-1;}
 function canPour(a,b){
   if(a===b||a<0||b<0)return false;
-  const A=S.flasks[a],B=S.flasks[b];
-  if(!A.length||B.length>=CAP)return false;
+  if(neighbors(a).indexOf(b)<0)return false;
+  const A=S.flasks[a],B=S.flasks[b],C=S.layout.ring;
+  const capB=b===C?CRUC_CAP:CAP;
+  if(!A.length||B.length>=capB)return false;
   const ta=A[A.length-1];
   if(!B.length)return true;
+  if(b===C)return true; // the crucible accepts anything
   const tb=B[B.length-1];
   return ta===P||tb===P||ta===tb;
 }
 function doPour(a,b){
   pushUndo();
-  const A=S.flasks[a],B=S.flasks[b];
+  const A=S.flasks[a],B=S.flasks[b],C=S.layout.ring;
   const t=A[A.length-1];
+  const capB=b===C?CRUC_CAP:CAP;
   if(t===P){B.push(A.pop());}
-  else{while(A.length&&A[A.length-1]===t&&B.length<CAP)B.push(A.pop());}
+  else{while(A.length&&A[A.length-1]===t&&B.length<capB)B.push(A.pop());}
   adoptTouched(B);S.moves++;S.sel=-1;
-  sfx.pour();save();render(true,b);
+  const p=levelParams(S.level);
+  let turned=false;
+  if(S.moves%p.wheel===0){rotateRing();turned=true;}
+  if(turned)sfx.turn();else sfx.pour();
+  save();render(true,b);
+  if(turned)toast("The wheel turns");
   if(checkWin())setTimeout(onWin,350);
 }
 /* A prismatic adopts the color it touches — but ONLY in the flask the player
    just poured into. Below first, then above; cascades. Prismatics elsewhere
-   on the board wait untouched until the player decides their fate. */
+   wait untouched until the player decides their fate. */
 function adoptTouched(f){
   let changed=true;
   while(changed){changed=false;
@@ -249,6 +356,15 @@ function adoptTouched(f){
       else if(above!==null&&above!==P){f[i]=above;changed=true;}
     }
   }
+}
+function rotateRing(){
+  const n=S.layout.ring,F=S.flasks;
+  if(n>1){
+    const seg=F.splice(0,n);
+    seg.unshift(seg.pop());
+    F.unshift(...seg); // rotated ring goes back ahead of the crucible
+  }
+  S.sel=-1;
 }
 function tapFlask(i){
   const f=S.flasks[i];
@@ -270,36 +386,76 @@ function doUndo(){
 }
 function doSpare(){
   if(S.spareLeft<=0){sfx.bad();return;}
-  pushUndo();S.flasks.push([]);S.spareLeft--;S.moves++;
-  toast("Spare flask added");sfx.tool();save();render();
+  pushUndo();
+  const C=S.layout.ring;
+  S.flasks.splice(C,0,[]); // the spare flask joins the ring, ahead of the crucible
+  S.layout.ring++;
+  S.spareLeft--;S.moves++;
+  toast("A spare flask joins the ring");sfx.tool();save();render();
 }
 function doRebrew(){
   if(S.rebrewLeft<=0){sfx.bad();return;}
   pushUndo();
   const p=levelParams(S.level);
-  S.flasks=genDeal(p,(Math.random()*1e9)|0);
+  const deal=genDeal(p,(Math.random()*1e9)|0);
+  S.flasks=deal.flasks;S.layout=deal.layout;
   S.spareLeft=p.spare;S.rebrewLeft=0;S.moves=0;S.sel=-1;
   toast("Rebrewed — a fresh soluble batch");sfx.tool();save();render();
 }
 
 /* ---------- render ---------- */
+let flaskDivs=[];
 function elixirHTML(e,isTop){
   if(e===P)return `<div class="elixir prism${isTop?" top":""}"></div>`;
   const c=COLORS[e];
   return `<div class="elixir${isTop?" top":""}" style="--glow:${c[1]}66;background:linear-gradient(180deg,${c[1]},${c[2]})"></div>`;
 }
+function mandalaSVG(W,H,cx,cy,R,n){
+  let s=`<svg class="msvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  s+=`<g class="spin" stroke="rgba(143,224,179,0.13)" fill="none">`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${(R+26).toFixed(1)}"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${R.toFixed(1)}"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="30"/>`;
+  const spokes=Math.max(n,12);
+  for(let i=0;i<spokes;i++){
+    const a=i*2*Math.PI/spokes;
+    s+=`<line x1="${(cx+30*Math.cos(a)).toFixed(1)}" y1="${(cy+30*Math.sin(a)).toFixed(1)}" x2="${(cx+(R+26)*Math.cos(a)).toFixed(1)}" y2="${(cy+(R+26)*Math.sin(a)).toFixed(1)}" stroke-width="1"/>`;
+  }
+  for(let i=0;i<n;i++){
+    const a=-Math.PI/2+(i+0.5)*2*Math.PI/n;
+    s+=`<circle cx="${(cx+(R+13)*Math.cos(a)).toFixed(1)}" cy="${(cy+(R+13)*Math.sin(a)).toFixed(1)}" r="3" fill="rgba(232,199,106,0.35)" stroke="none"/>`;
+  }
+  s+=`</g></svg>`;
+  return s;
+}
 function render(bump){
   $("lvlLabel").textContent="Level "+S.level;
   $("movesLabel").textContent=S.moves+(S.moves===1?" move":" moves");
-  const bd=$("board");bd.innerHTML="";
+  const bd=$("board");
+  const n=S.layout.ring, C=n;
+  const W=bd.clientWidth||340;
+  const R=Math.max(92,Math.min(148,(n*72)/(2*Math.PI)));
+  const cx=W/2, cy=R+86, H=cy+R+92;
+  bd.style.height=H+"px";
+  if(flaskDivs.length!==S.flasks.length){
+    bd.innerHTML=mandalaSVG(W,H,cx,cy,R,n);
+    flaskDivs=[];
+    S.flasks.forEach((f,i)=>{
+      const d=document.createElement("div");
+      d.addEventListener("click",()=>tapFlask(i));
+      bd.appendChild(d);flaskDivs.push(d);
+    });
+  }
   S.flasks.forEach((f,i)=>{
-    const d=document.createElement("div");
-    d.className="flask"+(S.sel===i?" sel":"")+(bump===i?" bump":"");
+    const d=flaskDivs[i], isC=i===C;
+    d.className="flask"+(S.sel===i?" sel":"")+(isC?" crucible":"")+(bump===i?" bump":"");
+    let x,y,w;
+    if(isC){x=cx;y=cy;w=70;}
+    else{const a=-Math.PI/2+i*2*Math.PI/n;x=cx+R*Math.cos(a);y=cy+R*Math.sin(a);w=56;}
+    d.style.left=x+"px";d.style.top=y+"px";d.style.width=w+"px";
     let fill="";
     for(let k=0;k<f.length;k++)fill+=elixirHTML(f[k],k===f.length-1);
-    d.innerHTML=`<div class="neck"></div><div class="body"><div class="fill">${fill}</div></div>`;
-    d.addEventListener("click",()=>tapFlask(i));
-    bd.appendChild(d);
+    d.innerHTML=`<div class="neck"></div><div class="body"><div class="fill">${fill}</div></div>`+(isC?`<div class="clabel">crucible</div>`:"");
   });
   $("undoBtn").disabled=!S.undo.length;
   const p=levelParams(S.level);
@@ -307,9 +463,13 @@ function render(bump){
   $("brewBtn").disabled=S.rebrewLeft<=0;
   $("flaskN").textContent=p.spare?("×"+S.spareLeft):"–";
   $("brewN").textContent=p.rebrew?("×"+S.rebrewLeft):"–";
-  const lg=[];
+  const lg=[
+    `<span>Pour to <b>neighboring</b> flasks or the <b>crucible</b></span>`,
+    `<span><b>The wheel</b> turns every ${p.wheel} moves</span>`,
+    `<span>Empty the <b>crucible</b> to complete the ritual</span>`
+  ];
   if(S.level>=4)lg.push("<span><b>✦ Prismatic</b> takes the color it touches</span>");
-  if(p.spare)lg.push("<span><b>⚗ Spare flask</b> when you're stuck</span>");
+  if(p.spare)lg.push("<span><b>⚗ Spare flask</b> joins the ring</span>");
   if(p.rebrew)lg.push("<span><b>🌀 Rebrew</b> reshuffles the batch</span>");
   $("legend").innerHTML=lg.join("");
   $("muteBtn").textContent=S.muted?"🔕":"🔔";
@@ -321,9 +481,11 @@ function toast(msg){
 }
 function unlockNotices(level){
   const p=levelParams(level),pp=levelParams(level-1);
-  if(p.prism>pp.prism)toast("New: ✦ Prismatic elixir — takes the color it touches");
+  if(level===1)toast("The mandala turns — pour to neighboring flasks");
+  else if(p.prism>pp.prism)toast("New: ✦ Prismatic elixir — takes the color it touches");
   else if(p.spare>pp.spare)toast("New tool: ⚗ Spare flask");
   else if(p.rebrew>pp.rebrew)toast("New tool: 🌀 Rebrew");
+  else if(p.wheel<pp.wheel)toast("The wheel turns faster now");
 }
 function onWin(){
   sfx.win();
@@ -335,15 +497,21 @@ function onWin(){
 /* ---------- persistence ---------- */
 function save(){
   try{localStorage.setItem(SAVE_KEY,JSON.stringify({
-    level:S.level,seed:S.seed,flasks:S.flasks,moves:S.moves,
+    level:S.level,seed:S.seed,flasks:S.flasks,layout:S.layout,moves:S.moves,
     spareLeft:S.spareLeft,rebrewLeft:S.rebrewLeft,muted:S.muted,
     maxLevel:S.maxLevel,undo:S.undo.slice(-60)}));}catch(e){}
 }
 function load(){
   try{
-    const o=JSON.parse(localStorage.getItem(SAVE_KEY));
-    if(o&&o.flasks&&o.flasks.length){
-      S={level:o.level,seed:o.seed,flasks:o.flasks,moves:o.moves||0,
+    let o=JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(!o){ // migrate a v1 (grid) save: keep progress, add the crucible
+      o=JSON.parse(localStorage.getItem(V1_KEY));
+      if(o&&o.flasks&&o.flasks.length){
+        o.layout={ring:o.flasks.length};o.flasks.push([]);o.undo=[];
+      }
+    }
+    if(o&&o.flasks&&o.flasks.length&&o.layout&&o.layout.ring){
+      S={level:o.level,seed:o.seed,flasks:o.flasks,layout:o.layout,moves:o.moves||0,
         spareLeft:o.spareLeft,rebrewLeft:o.rebrewLeft,undo:o.undo||[],
         muted:!!o.muted,sel:-1,maxLevel:o.maxLevel||o.level};
       return true;
@@ -355,6 +523,7 @@ function load(){
 /* ---------- init ---------- */
 function startLevel(level,seed){
   S=newState(level,seed===undefined?(Math.random()*1e9)|0:seed);
+  flaskDivs=[];
   $("win").classList.remove("show");
   unlockNotices(level);save();render();
 }
