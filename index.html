@@ -27,7 +27,7 @@ header{display:flex;align-items:center;justify-content:space-between}
 .brand{font-family:var(--mono);letter-spacing:.28em;font-size:13px;color:var(--jade)}
 .lvl{font-family:var(--mono);font-size:13px;color:var(--mute)}
 .hbtns{display:flex;gap:8px}
-.hbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--jade);
+.hbtn{width:auto;height:44px;padding:0 12px;gap:6px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--jade);
   font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .hbtn:active{transform:scale(.94)}
 #toast{min-height:22px;text-align:center;font-size:13px;color:var(--gold);font-family:var(--mono);letter-spacing:.04em}
@@ -75,6 +75,8 @@ header{display:flex;align-items:center;justify-content:space-between}
   font:inherit;font-weight:700;font-size:17px;padding:14px 34px;cursor:pointer;min-height:52px}
 .bigbtn:active{transform:scale(.96)}
 footer{margin-top:auto;padding-top:14px;text-align:center;font-size:11px;color:var(--mute);font-family:var(--mono);letter-spacing:.08em}
+.hbtn .hb-l{font-size:12px;font-weight:600;letter-spacing:.02em}
+.goal{text-align:center;color:var(--mute);font-size:13.5px;margin:4px 0 2px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:11.5px;color:var(--mute);text-align:center}
 .legend b{color:var(--jade);font-weight:600}
 </style>
@@ -87,10 +89,11 @@ footer{margin-top:auto;padding-top:14px;text-align:center;font-size:11px;color:v
       <div class="lvl" id="lvlLabel">Level 1</div>
     </div>
     <div class="hbtns">
-      <button class="hbtn" id="muteBtn" aria-label="Toggle sound">🔔</button>
-      <button class="hbtn" id="restartBtn" aria-label="Restart level">↺</button>
+      <button class="hbtn" id="muteBtn" aria-label="Toggle sound">🔔<span class="hb-l">Sound</span></button>
+      <button class="hbtn" id="restartBtn" aria-label="Restart level">↺<span class="hb-l">Restart</span></button>
     </div>
   </header>
+  <div class="goal">Pour until every flask holds a single color.</div>
   <div id="toast"></div>
   <div class="board" id="board"></div>
   <div class="moves" id="movesLabel">0 moves</div>
