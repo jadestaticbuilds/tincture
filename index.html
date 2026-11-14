@@ -484,8 +484,8 @@ function toast(msg){
 }
 function unlockNotices(level){
   const p=levelParams(level),pp=levelParams(level-1);
-  if(level===1)toast("The mandala turns — pour to neighboring flasks");
-  else if(p.prism>pp.prism)toast("New: ✦ Prismatic elixir — takes the color it touches");
+  if(level===1)toast("The mandala turns. Pour to neighboring flasks");
+  else if(p.prism>pp.prism)toast("New: ✦ Prismatic elixir, takes the color it touches");
   else if(p.spare>pp.spare)toast("New tool: ⚗ Spare flask");
   else if(p.rebrew>pp.rebrew)toast("New tool: 🌀 Rebrew");
   else if(p.wheel<pp.wheel)toast("The wheel turns faster now");
